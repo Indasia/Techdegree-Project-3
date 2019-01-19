@@ -3,8 +3,9 @@
 
 
 // set focus on the first text by default
-$("#name").focus();
-
+$(document).ready(function(){
+    $("#name").focus();
+});
 
 //// "job role" section ////
 // hide text area
@@ -51,20 +52,15 @@ $($design).change(function(){
 
 
 //// "register for activities" section ////
-/* 1. Some events are at the same day and time as others. If the user selects a workshop, 
-don't allow selection of a workshop at the same day and time -- you should disable the 
-checkbox and visually indicate that the workshop in the competing time slot isn't available. 
- 2. When a user unchecks an activity, make sure that competing activities (if there are any) 
-are no longer disabled. 
- 3. As a user selects activities, a running total should display below the list of checkboxes. 
+/*  As a user selects activities, a running total should display below the list of checkboxes. 
 For example, if the user selects "Main Conference", then Total: $200 should appear. 
 If they add 1 workshop, the total should change to Total: $300. */
 
 // variables to select activity checkboxes
 const $jsFrameworks = $("input[name = 'js-frameworks']");
-const $jsLibs = $("input [name = 'js-libs']");
-const $express = $("input [name = 'express']");
-const $node = $("input [name = 'node']");
+const $jsLibs = $("input[name = 'js-libs']");
+const $express = $("input[name = 'express']");
+const $node = $("input[name = 'node']");
 
 // if js-frameworks is checked, stop express from being checked
 $($jsFrameworks).change(function() {
@@ -98,3 +94,63 @@ $($node).change(function() {
         $jsLibs.prop("disabled", false)
     }
 });
+
+// running total for activity checkboxes
+let total = 0;
+$(".activities").append("<p>Total: </p>")
+
+
+//// "payment info" section ////
+
+// 1. Display payment sections based on the payment option chosen in the select menu.
+
+const $payment = $("#payment");
+const $cc = $("#payment option[value = 'credit card']")
+const $paypal = $("#payment option[value = 'paypal']")
+const $bitcoin = $("#payment option[value = 'bitcoin']")
+
+/*
+The "Credit Card" payment option should be selected by default. Display the #credit-card div, 
+and hide the "PayPal" and "Bitcoin" information. Payment option in the select menu should match 
+the payment option displayed on the page.
+*/
+
+$("#payment").change(function(){   
+    if ($payment.val() === "credit card") {
+        $("#credit-card").show();
+        $("p").hide();
+    } else if ($payment.val() === "paypal") {
+        $("p:first").show();
+        $("p:last").hide();
+        $("#credit-card").hide();
+    } else if ($payment.val() === "bitcoin") {
+        $("p:last").show();
+        $("p:first").hide();
+
+        $("#credit-card").hide();
+    }
+});
+
+/*
+ NOTE: The user should not be able to select the "Select Payment Method" option from the 
+payment select menu, because the user should not be able to submit the form without a chosen payment option.
+*/ 
+
+
+
+
+//// form validation ////
+// valid name
+function isValidName(name) {
+    return /^[a-z]+$/;
+}
+// valid email address
+function isValidEmail(email) {
+    /[^@]+@[^@.]+\.[a-z]+$/i.test(email);
+}
+// user must select at least one checkbox
+
+// valid payment method
+
+
+//// form messages ////
