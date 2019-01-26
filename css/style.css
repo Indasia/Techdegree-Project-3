@@ -125,8 +125,6 @@ input:invalid {
 }
 
 
-
-
 .error {
   width  : 100%;
   padding: 0;
@@ -188,7 +186,7 @@ button:hover {
 }
 
 .credit-card {
-	margin-top: 1.25em;\
+	margin-top: 1.25em;
 }
 
 /* ================================= 

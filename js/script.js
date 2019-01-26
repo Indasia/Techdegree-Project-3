@@ -8,6 +8,7 @@ $(document).ready(function(){
 });
 
 //--------------------------- "job role" section ---------------------------//
+
 // hide text area
 $("#other-title").hide();
 // when other is selected, show the text area, otherwise keep it hidden
@@ -20,9 +21,14 @@ $("#title").on("click", function(event){
 });
 
 //--------------------------- "t-shirt" section ---------------------------//
+
 // variables for both drop down menus
 const $colors = $("#colors-js-puns");
 const $design = $("#design");
+const $selectTheme = $("#design option[value = 'select theme']");
+
+// disable the select theme option
+$selectTheme.prop("disabled", true);
 
 // hide color drop down menu
 $colors.hide();
@@ -51,11 +57,13 @@ $($design).change(function(){
     });
 
 //--------------------------- "register for activities" section ---------------------------//
+
 // variables to select activity checkboxes
 const $jsFrameworks = $("input[name = 'js-frameworks']");
 const $jsLibs = $("input[name = 'js-libs']");
 const $express = $("input[name = 'express']");
 const $node = $("input[name = 'node']");
+const $activities = $(".activities");
 
 // if js-frameworks is checked, stop express from being checked
 $($jsFrameworks).change(function() {
@@ -90,15 +98,10 @@ $($node).change(function() {
     }
 });
 
-// running total variables
-const $activities = $(".activities");
-let $runningTotalDiv = document.createElement("<div>Total: </div>");
-$activities.append($runningTotalDiv);
+// the starting price is $0
 let $price = 0;
-
 // when an activity is checked, add or subtract price
-
-$($activities).on("change", function() {
+$($activities).on("change", function () {
     if ($("input[name = 'all']").prop("checked")) {
         $price += 200;
     } else {
@@ -135,15 +138,18 @@ $($activities).on("change", function() {
         $price -= 100;
     }
 
+    let $runningTotalDiv = $(`<div>Total: ${$price} </div>`);
+    $activities.append($runningTotalDiv);
 });
 
-
 //--------------------------- "payment info" section ---------------------------//
+
 // variable for payment div
 const $payment = $("#payment");
+const $selectMethod = $("#payment option[value = 'select_method']");
 
 // disable select payment method and hide it
-$("#payment option[value = 'select_method']").prop("disabled", true).hide();
+$selectMethod.prop("disabled", true).hide();
 
 //hide <p> elements so that only the credit card section shows
 $($("p").get(0)).hide();
@@ -165,23 +171,17 @@ $("#payment").change(function(){
         $("#credit-card").hide();
     }
 });
-
+\
 
 //--------------------------- form validation ---------------------------//
 
 var form = document.getElementsByTagName('form')[0];
 var error = document.querySelector('.error');
-
-
-
-
+const button = document.getElementsByTagName("button");
 
 // validate the name input
 // name input cannot blank
-
 // validate the email input
-
-
 
 
 // validate the credit card number input
