@@ -7,23 +7,23 @@ $(document).ready(function(){
     $("#name").focus();
 });
 
-//// "job role" section ////
+//--------------------------- "job role" section ---------------------------//
 // hide text area
 $("#other-title").hide();
 // when other is selected, show the text area, otherwise keep it hidden
-$("#title").on("click", function(e){
-    if (e.target.value === "other"){
+$("#title").on("click", function(event){
+    if (event.target.value === "other"){
         $("#other-title").show();
     } else {
         $("#other-title").hide();
     }
 });
 
-
-//// "t-shirt" section ////
+//--------------------------- "t-shirt" section ---------------------------//
 // variables for both drop down menus
 const $colors = $("#colors-js-puns");
 const $design = $("#design");
+
 // hide color drop down menu
 $colors.hide();
 // when a certain design is selected, show appropiate colors
@@ -35,7 +35,7 @@ $($design).change(function(){
         $("#color option[value = 'darkslategrey']").show();
         $("#color option[value = 'gold']").show();
         $("#color option[value = 'tomato']").hide();
-        $("color option[value = 'steelblue']").hide();
+        $("#color option[value = 'steelblue']").hide();
         $("#color option[value = 'dimgrey']").hide();
     } 
     else if ($design.val() === "heart js"){
@@ -50,12 +50,7 @@ $($design).change(function(){
     }
     });
 
-
-//// "register for activities" section ////
-/*  As a user selects activities, a running total should display below the list of checkboxes. 
-For example, if the user selects "Main Conference", then Total: $200 should appear. 
-If they add 1 workshop, the total should change to Total: $300. */
-
+//--------------------------- "register for activities" section ---------------------------//
 // variables to select activity checkboxes
 const $jsFrameworks = $("input[name = 'js-frameworks']");
 const $jsLibs = $("input[name = 'js-libs']");
@@ -95,62 +90,162 @@ $($node).change(function() {
     }
 });
 
-// running total for activity checkboxes
-let total = 0;
-$(".activities").append("<p>Total: </p>")
+// running total variables
+const $activities = $(".activities");
+let $runningTotalDiv = document.createElement("<div>Total: </div>");
+$activities.append($runningTotalDiv);
+let $price = 0;
+
+// when an activity is checked, add or subtract price
+
+$($activities).on("change", function() {
+    if ($("input[name = 'all']").prop("checked")) {
+        $price += 200;
+    } else {
+        $price -= 200;
+    }
+    if ($("input[name = 'js-frameworks']").prop("checked")) {
+        $price += 100;
+    } else {
+        $price -= 100;
+    }
+    if ($("input[name = 'js-libs']").prop("checked")) {
+        $price += 100;
+    } else {
+        $price -= 100;
+    }
+    if ($("input[name = 'express']").prop("checked")) {
+        $price += 100;
+    } else {
+        $price -= 100;
+    }
+    if ($("input[name = 'node']").prop("checked")) {
+        $price += 100;
+    } else {
+        $price -= 100;
+    }
+    if ($("input[name = 'build-tools']").prop("checked")) {
+        $price += 100;
+    } else {
+        $price -= 100;
+    }
+    if ($("input[name = 'npm']").prop("checked")) {
+        $price += 100;
+    } else {
+        $price -= 100;
+    }
+
+});
 
 
-//// "payment info" section ////
-
-// 1. Display payment sections based on the payment option chosen in the select menu.
-
+//--------------------------- "payment info" section ---------------------------//
+// variable for payment div
 const $payment = $("#payment");
-const $cc = $("#payment option[value = 'credit card']")
-const $paypal = $("#payment option[value = 'paypal']")
-const $bitcoin = $("#payment option[value = 'bitcoin']")
 
-/*
-The "Credit Card" payment option should be selected by default. Display the #credit-card div, 
-and hide the "PayPal" and "Bitcoin" information. Payment option in the select menu should match 
-the payment option displayed on the page.
-*/
+// disable select payment method and hide it
+$("#payment option[value = 'select_method']").prop("disabled", true).hide();
 
-$("#payment").change(function(){   
+//hide <p> elements so that only the credit card section shows
+$($("p").get(0)).hide();
+$($("p").get(1)).hide();
+
+// if a certain payment method is selected, hide the other two payment methods
+$("#payment").change(function(){ 
     if ($payment.val() === "credit card") {
         $("#credit-card").show();
-        $("p").hide();
+        $($("p").get(0)).hide();
+        $($("p").get(1)).hide();
     } else if ($payment.val() === "paypal") {
-        $("p:first").show();
-        $("p:last").hide();
+        $($("p").get(0)).show();
+        $($("p").get(1)).hide();
         $("#credit-card").hide();
     } else if ($payment.val() === "bitcoin") {
-        $("p:last").show();
-        $("p:first").hide();
-
+        $($("p").get(1)).show();
+        $($("p").get(0)).hide();
         $("#credit-card").hide();
     }
 });
 
-/*
- NOTE: The user should not be able to select the "Select Payment Method" option from the 
-payment select menu, because the user should not be able to submit the form without a chosen payment option.
-*/ 
+
+//--------------------------- form validation ---------------------------//
+
+var form = document.getElementsByTagName('form')[0];
+var error = document.querySelector('.error');
 
 
 
 
-//// form validation ////
-// valid name
-function isValidName(name) {
-    return /^[a-z]+$/;
+
+// validate the name input
+// name input cannot blank
+
+// validate the email input
+
+
+
+
+// validate the credit card number input
+const ccValidation = function(event) {
+    const valid = true;
+    $('#cc-num').on('keyup', function () {
+        const ccRegex = /^[0-9]{13,16}$/;
+        const ccNumVal = $('#cc-num').val();
+        if (!$(this).val().match(ccRegex)) {
+            if ($('#isCreditCardValid').length === 0) {
+                $('#cc-num').after('<p class="validateCreditCard" id="isCreditCardValid">Please enter a valid credit card number between 13-16 digits.</p>');
+                valid = false;
+                event.preventDefault();
+            }
+        } else {
+            $('#isCreditCardValid').remove()
+            valid = true;
+        }
+        return valid;
+    });
+
 }
-// valid email address
-function isValidEmail(email) {
-    /[^@]+@[^@.]+\.[a-z]+$/i.test(email);
+ccValidation();
+
+//validate the ZIP code input
+const zipValidation = function (event) {
+    const valid = true;
+    $('#zip').on('keyup', function () {
+        const zipRegex = /^[0-9]{5}$/;
+        const ccNumVal = $('#zip').val();
+        if (!$(this).val().match(zipRegex)) {
+            if ($('#isZipCodeValid').length === 0) {
+                $('#zip').after('<p class="validateZipCode" id="isZipCodeValid">Please enter a valid 5-digit ZIP code.</p>');
+                valid = false;
+                event.preventDefault();
+            }
+        } else {
+            $('#isZipCodeValid').remove()
+            valid = true;
+        }
+        return valid;
+    });
+
 }
-// user must select at least one checkbox
+zipValidation();
 
-// valid payment method
+// validate the CVV input
+const cvvValidation = function (event) {
+    const valid = true;
+    $('#cvv').on('keyup', function () {
+        const cvvRegex = /^[0-9]{3}$/;
+        const ccNumVal = $('#cvv').val();
+        if (!$(this).val().match(cvvRegex)) {
+            if ($('#isCvvValid').length === 0) {
+                $('#cvv').after('<p class="validateCvv" id="isCvvValid">Please enter a valid 3-digit CVV.</p>');
+                valid = false;
+                event.preventDefault();
+            }
+        } else {
+            $('#isCvvValid').remove()
+            valid = true;
+        }
+        return valid;
+    });
 
-
-//// form messages ////
+}
+cvvValidation();
