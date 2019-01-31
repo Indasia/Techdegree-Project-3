@@ -1,4 +1,3 @@
-
 //*** UNIT 3 - INTERACTIVE FORM ***//
 
 
@@ -28,11 +27,11 @@ const $design = $("#design");
 const $selectTheme = $("#design option[value = 'select theme']");
 
 // disable the select theme option
-$selectTheme.prop("disabled", true);
+$selectTheme.prop("disabled", true).hide();
 
 // hide color drop down menu
 $colors.hide();
-// when a certain design is selected, show appropiate colors
+// when a certain design is selected, show appropriate colors
 $($design).change(function(){   
     if ($design.val() === "js puns") {
         $colors.show();
@@ -98,48 +97,28 @@ $($node).change(function() {
     }
 });
 
-// the starting price is $0
-let $price = 0;
-// when an activity is checked, add or subtract price
-$($activities).on("change", function () {
-    if ($("input[name = 'all']").prop("checked")) {
-        $price += 200;
-    } else {
-        $price -= 200;
-    }
-    if ($("input[name = 'js-frameworks']").prop("checked")) {
-        $price += 100;
-    } else {
-        $price -= 100;
-    }
-    if ($("input[name = 'js-libs']").prop("checked")) {
-        $price += 100;
-    } else {
-        $price -= 100;
-    }
-    if ($("input[name = 'express']").prop("checked")) {
-        $price += 100;
-    } else {
-        $price -= 100;
-    }
-    if ($("input[name = 'node']").prop("checked")) {
-        $price += 100;
-    } else {
-        $price -= 100;
-    }
-    if ($("input[name = 'build-tools']").prop("checked")) {
-        $price += 100;
-    } else {
-        $price -= 100;
-    }
-    if ($("input[name = 'npm']").prop("checked")) {
-        $price += 100;
-    } else {
-        $price -= 100;
-    }
+// the starting price is $0 when an activity isn't selected
+let price = 0;
+// create a span to hold the total price, and append it to the activities section
+const runningTotal = document.createElement("span");
+$(".activities").append(runningTotal);
 
-    let $runningTotalDiv = $(`<div>Total: ${$price} </div>`);
-    $activities.append($runningTotalDiv);
+// when an activity is checked, add or subtract price from total
+$($activities).on("change", function (event) {
+// get the text content of the label which is the parent
+    const checkbox = $(event.target).parent().text();
+// get the last 3 characters and make them an integer and save it as "cost"
+    let cost = parseInt(checkbox.substring(checkbox.length - 3));
+// if the event target is checked...
+    if ($(event.target).is(':checked')) {
+// increase the price by the cost
+        price += cost;
+    } else {
+// if it's unchecked decrease the price by the cost
+        price -= cost;
+    }
+// update it on the page
+    runningTotal.innerHTML = "Total: $" + price;
 });
 
 //--------------------------- "payment info" section ---------------------------//
@@ -156,96 +135,90 @@ $($("p").get(0)).hide();
 $($("p").get(1)).hide();
 
 // if a certain payment method is selected, hide the other two payment methods
-$("#payment").change(function(){ 
+$($payment).change(function(){ 
+// if credit card is selected, show the credit card section and hide paypal and bitcoin
     if ($payment.val() === "credit card") {
         $("#credit-card").show();
         $($("p").get(0)).hide();
         $($("p").get(1)).hide();
+// if paypal is selected, show the paypal section and hide credit card and bitcoin section
     } else if ($payment.val() === "paypal") {
         $($("p").get(0)).show();
         $($("p").get(1)).hide();
         $("#credit-card").hide();
+// if bitcoin is selected, show the bitcoin section and hide paypal and credit card section
     } else if ($payment.val() === "bitcoin") {
         $($("p").get(1)).show();
         $($("p").get(0)).hide();
         $("#credit-card").hide();
     }
 });
-\
 
 //--------------------------- form validation ---------------------------//
 
-var form = document.getElementsByTagName('form')[0];
-var error = document.querySelector('.error');
-const button = document.getElementsByTagName("button");
-
-// validate the name input
-// name input cannot blank
-// validate the email input
-
-
-// validate the credit card number input
-const ccValidation = function(event) {
-    const valid = true;
-    $('#cc-num').on('keyup', function () {
-        const ccRegex = /^[0-9]{13,16}$/;
-        const ccNumVal = $('#cc-num').val();
-        if (!$(this).val().match(ccRegex)) {
-            if ($('#isCreditCardValid').length === 0) {
-                $('#cc-num').after('<p class="validateCreditCard" id="isCreditCardValid">Please enter a valid credit card number between 13-16 digits.</p>');
-                valid = false;
-                event.preventDefault();
-            }
-        } else {
-            $('#isCreditCardValid').remove()
-            valid = true;
+// worked with Lisa and Natia on this section
+// a function that checks the form for errors before submitting
+function validateForm() {
+// variables for the name and emai input fields
+    let nameValue = $('#name').val();
+    let emailValue = $('#mail').val();
+// if the characters that the user enters into the name field don't match the reg exp, show an error    
+    if (isValidName(nameValue) == false) {
+        $("#name").css("border-color", "red");
+        setTimeout(function () { alert("Please enter your name!"); }, 1500);
+    }
+// if the characters that the user enters into the name field don't match the reg exp, show an error
+    if (isValidEmail(emailValue) == false) {
+        $("#mail").css("border-color", "red");
+        setTimeout(function () { alert("Please enter a valid email address!"); }, 1500);
+    }
+// if the activity price is 0 when the user tries to click sumbit, show an error
+    if (price === 0) {
+        setTimeout(function () { alert("You must select an activity!"); }, 1500);
+    }
+// variables for the credit card section
+    let cardNumber = $("#cc-num").val();
+    let zip = $("#zip").val();
+    let cvv = $("#cvv").val();
+/* if the user is paying with a credit card, show error if card number 
+reg exp, zip reg exp, and cvv reg exp dont match */
+    if ($payment.val() === "credit card") {
+        if (isValidCardNumber(cardNumber) == false) {
+            $("#cc-num").css("border-color", "red");
+            setTimeout(function () { alert("Please enter a valid credit card number that is between 13-16 digits!"); }, 1500);
         }
-        return valid;
-    });
-
-}
-ccValidation();
-
-//validate the ZIP code input
-const zipValidation = function (event) {
-    const valid = true;
-    $('#zip').on('keyup', function () {
-        const zipRegex = /^[0-9]{5}$/;
-        const ccNumVal = $('#zip').val();
-        if (!$(this).val().match(zipRegex)) {
-            if ($('#isZipCodeValid').length === 0) {
-                $('#zip').after('<p class="validateZipCode" id="isZipCodeValid">Please enter a valid 5-digit ZIP code.</p>');
-                valid = false;
-                event.preventDefault();
-            }
-        } else {
-            $('#isZipCodeValid').remove()
-            valid = true;
+        if (isValidZipcode(zip) == false) {
+            $("#zip").css("border-color", "red");
+            setTimeout(function () { alert("Please enter your 5-digit ZIPCODE!"); }, 1500);
         }
-        return valid;
-    });
-
-}
-zipValidation();
-
-// validate the CVV input
-const cvvValidation = function (event) {
-    const valid = true;
-    $('#cvv').on('keyup', function () {
-        const cvvRegex = /^[0-9]{3}$/;
-        const ccNumVal = $('#cvv').val();
-        if (!$(this).val().match(cvvRegex)) {
-            if ($('#isCvvValid').length === 0) {
-                $('#cvv').after('<p class="validateCvv" id="isCvvValid">Please enter a valid 3-digit CVV.</p>');
-                valid = false;
-                event.preventDefault();
-            }
-        } else {
-            $('#isCvvValid').remove()
-            valid = true;
+        if (isValidCVV(cvv) == false) {
+            $("#zip").css("border-color", "red");
+            setTimeout(function () { alert("Please enter the 3-digit number on the back of your card!"); }, 1500);
         }
-        return valid;
-    });
-
+    };
+};
+// name reg exp
+function isValidName(nameValue) {
+    return /^[a-zA-Z][a-zA-Z\s]+$/i.test(nameValue);
+};
+// this email regex is taken from https://emailregex.com/
+function isValidEmail(emailValue) {
+    return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(emailValue);
+};
+// credit card reg exp
+function isValidCardNumber(cardNumber) {
+    return /^\d{13,16}D*$/.test(cardNumber);
 }
-cvvValidation();
+// zipcode reg exp
+function isValidZipcode(zipcode) {
+    return /^\d{5}$/.test(zipcode);
+}
+// cvv reg exp
+function isValidCVV(cvv) {
+    return /^\d{3}$/.test(cvv);
+}
+// if there are errors in the validation form, prevent the form from submitting
+$('button').on('click', function (e) {
+    e.preventDefault();
+    validateForm();
+});
