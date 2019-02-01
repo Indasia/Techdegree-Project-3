@@ -1,9 +1,12 @@
 //*** UNIT 3 - INTERACTIVE FORM ***//
 
 
-// set focus on the first text by default
-$(document).ready(function(){
+// when the page load...
+$(document).ready(function () {
+// focus on name field    
     $("#name").focus();
+// credit card section is selected by default
+    $("#payment").val("credit card");
 });
 
 //--------------------------- "job role" section ---------------------------//
@@ -11,7 +14,7 @@ $(document).ready(function(){
 // hide text area
 $("#other-title").hide();
 // when other is selected, show the text area, otherwise keep it hidden
-$("#title").on("click", function(event){
+$("#title").on("change", function(event){
     if (event.target.value === "other"){
         $("#other-title").show();
     } else {
@@ -32,7 +35,7 @@ $selectTheme.prop("disabled", true).hide();
 // hide color drop down menu
 $colors.hide();
 // when a certain design is selected, show appropriate colors
-$($design).change(function(){   
+$design.change(function(){   
     if ($design.val() === "js puns") {
         $colors.show();
         $("#color").val("cornflowerblue");
@@ -126,7 +129,7 @@ $($activities).on("change", function (event) {
 // variable for payment div
 const $payment = $("#payment");
 const $selectMethod = $("#payment option[value = 'select_method']");
-
+const $creditSelect = $('#payment option[value=" credit card"]');
 // disable select payment method and hide it
 $selectMethod.prop("disabled", true).hide();
 
@@ -159,6 +162,7 @@ $($payment).change(function(){
 // worked with Lisa and Natia on this section
 // a function that checks the form for errors before submitting
 function validateForm() {
+    let isValid = true;
 // variables for the name and emai input fields
     let nameValue = $('#name').val();
     let emailValue = $('#mail').val();
@@ -166,15 +170,17 @@ function validateForm() {
     if (isValidName(nameValue) == false) {
         $("#name").css("border-color", "red");
         setTimeout(function () { alert("Please enter your name!"); }, 1500);
+        isValid = false;
     }
 // if the characters that the user enters into the name field don't match the reg exp, show an error
     if (isValidEmail(emailValue) == false) {
         $("#mail").css("border-color", "red");
-        setTimeout(function () { alert("Please enter a valid email address!"); }, 1500);
+        isValid = false;
     }
 // if the activity price is 0 when the user tries to click sumbit, show an error
     if (price === 0) {
         setTimeout(function () { alert("You must select an activity!"); }, 1500);
+        isValid = false;
     }
 // variables for the credit card section
     let cardNumber = $("#cc-num").val();
@@ -186,16 +192,20 @@ reg exp, zip reg exp, and cvv reg exp dont match */
         if (isValidCardNumber(cardNumber) == false) {
             $("#cc-num").css("border-color", "red");
             setTimeout(function () { alert("Please enter a valid credit card number that is between 13-16 digits!"); }, 1500);
+            isValid = false;
         }
         if (isValidZipcode(zip) == false) {
             $("#zip").css("border-color", "red");
             setTimeout(function () { alert("Please enter your 5-digit ZIPCODE!"); }, 1500);
+            isValid = false;
         }
         if (isValidCVV(cvv) == false) {
-            $("#zip").css("border-color", "red");
+            $("#cvv").css("border-color", "red");
             setTimeout(function () { alert("Please enter the 3-digit number on the back of your card!"); }, 1500);
+            isValid = false;
         }
     };
+    return isValid;
 };
 // name reg exp
 function isValidName(nameValue) {
@@ -205,7 +215,7 @@ function isValidName(nameValue) {
 function isValidEmail(emailValue) {
     return /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(emailValue);
 };
-// credit card reg exp
+// credit card reg exp  
 function isValidCardNumber(cardNumber) {
     return /^\d{13,16}D*$/.test(cardNumber);
 }
@@ -219,6 +229,7 @@ function isValidCVV(cvv) {
 }
 // if there are errors in the validation form, prevent the form from submitting
 $('button').on('click', function (e) {
-    e.preventDefault();
-    validateForm();
+    if (!validateForm()) {
+        e.preventDefault();
+    }
 });
